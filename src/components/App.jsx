@@ -1,31 +1,29 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import Wrapper from './Wrapper/Wrapper';
 import FeedbackOptions from './FeedbackOptions/FeedbackOptions';
 import Statistics from './Statistics/Statistics';
 import Notification from './Notification/Notification';
 
-export class App extends Component {
-  state = {
+export const App = () => {
+  const feedbackOtions = ['good', 'neutral', 'bad'];
+
+  const [feedbacks, setFeedbacks] = useState({
     good: 0,
     neutral: 0,
     bad: 0,
+  });
+
+  const onLeaveFeedback = option => {
+    setFeedbacks(prevState => {
+      const value = prevState[option];
+      return { ...prevState, [option]: value + 1 };
+    });
   };
 
-  onLeaveFeedback = option => {
-    this.setState(prevState => ({
-      [option]: prevState[option] + 1,
-    }));
-  };
+  const total = feedbacks.good + feedbacks.neutral + feedbacks.bad;
 
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
-    const total = good + neutral + bad;
-    return Number(total);
-  };
-
-  countPositiveFeedbackPercentage = () => {
-    const { good } = this.state;
-    const total = this.countTotalFeedback();
+  const countPositiveFeedbackPercentage = () => {
+    const good = feedbacks.good;
     if (!total) {
       return 0;
     }
@@ -33,31 +31,29 @@ export class App extends Component {
     return Number(result);
   };
 
-  render() {
-    const { good, neutral, bad } = this.state;
-    const total = this.countTotalFeedback();
-    const positivePercentage = this.countPositiveFeedbackPercentage();
-    return (
-      <>
-        <Wrapper title="Please leave feedback">
-          <FeedbackOptions
-            options={Object.keys(this.state)}
-            onLeaveFeedback={this.onLeaveFeedback}
+  const { good, neutral, bad } = feedbacks;
+
+  const positivePercentage = countPositiveFeedbackPercentage();
+  return (
+    <>
+      <Wrapper title="Please leave feedback">
+        <FeedbackOptions
+          options={feedbackOtions}
+          onLeaveFeedback={onLeaveFeedback}
+        />
+      </Wrapper>
+      {total !== 0 && (
+        <Wrapper title="Statistics">
+          <Statistics
+            good={good}
+            neutral={neutral}
+            bad={bad}
+            total={total}
+            positivePercentage={positivePercentage}
           />
         </Wrapper>
-        {total !== 0 && (
-          <Wrapper title="Statistics">
-            <Statistics
-              good={good}
-              neutral={neutral}
-              bad={bad}
-              total={total}
-              positivePercentage={positivePercentage}
-            />
-          </Wrapper>
-        )}
-        {total === 0 && <Notification message="There is no feedback" />}
-      </>
-    );
-  }
-}
+      )}
+      {total === 0 && <Notification message="There is no feedback" />}
+    </>
+  );
+};
