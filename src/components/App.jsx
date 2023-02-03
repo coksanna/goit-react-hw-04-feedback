@@ -20,10 +20,10 @@ export const App = () => {
     });
   };
 
-  const total = feedbacks.good + feedbacks.neutral + feedbacks.bad;
+  const { good, neutral, bad } = feedbacks;
+  const total = good + neutral + bad;
 
   const countPositiveFeedbackPercentage = () => {
-    const good = feedbacks.good;
     if (!total) {
       return 0;
     }
@@ -31,9 +31,8 @@ export const App = () => {
     return Number(result);
   };
 
-  const { good, neutral, bad } = feedbacks;
-
   const positivePercentage = countPositiveFeedbackPercentage();
+
   return (
     <>
       <Wrapper title="Please leave feedback">
